@@ -12,6 +12,12 @@ import WalletConnectionFence from "@components/moleculas/WalletConnectionFence";
 
 interface ISignPageProps {}
 
+function hexToBytes(hex: string) {
+  for (var bytes = [], c = 0; c < hex.length; c += 2)
+    bytes.push(parseInt(hex.substr(c, 2), 16));
+  return bytes;
+}
+
 const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
   const router = useRouter();
 
@@ -35,6 +41,14 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
   const onCopy = () => {
     copy(`/submitowner ${name} ${message} ${signedData}`);
     setCopied(true);
+  };
+
+  const onSign = () => {
+    const bytesValue: Uint8Array = hexToBytes(
+      (message as string).slice(2)
+    ) as any;
+
+    signMessage({ message: bytesValue });
   };
 
   return (
@@ -75,9 +89,7 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
             <Card sx={{ padding: 14, maxWidth: 600 }}>
               <Text sx={{ wordBreak: "break-all" }}>{message}</Text>
             </Card>
-            <Button onClick={() => signMessage({ message })}>
-              Sign Message
-            </Button>
+            <Button onClick={onSign}>Sign Message</Button>
           </>
         )}
         {error && <Text type="danger">{error.message}</Text>}
