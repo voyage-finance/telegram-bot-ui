@@ -6,6 +6,7 @@ import WrongNetworkBanner from "./WrongNetworkBanner";
 import Link from "next/link";
 import React, { ReactEventHandler } from "react";
 import WalletNavItem from "@components/moleculas/WalletNavItem";
+import { Text } from "@components/atoms";
 
 const HEADER_HEIGHT = 48;
 
@@ -67,6 +68,7 @@ const Navigation: React.FC = () => {
           }}
         >
           <Box className={classes.logo}>
+            <Text weight="bold">Voyage Safe</Text>
             {/* <Link href="/">
               <Logo />
             </Link> */}

@@ -47,14 +47,14 @@ const ConnectWallet: React.FC = () => {
           </Group>
         </MantineMenu.Target>
         <MantineMenu.Dropdown>
-          <MenuItem icon={<Copy />} rightSection={<ArrowUpRight size={14} />}>
+          {/* <MenuItem icon={<Copy />} rightSection={<ArrowUpRight size={14} />}>
             Copy address
           </MenuItem>
           <Divider />
           <MenuItem icon={<Wallet />}>Balance</MenuItem>
           <MenuItem icon={<History />}>History</MenuItem>
           <MenuItem icon={<Settings />}>Settings</MenuItem>
-          <Divider />
+          <Divider /> */}
           <MenuItem
             icon={<Power color="#E84747" />}
             onClick={() => disconnect()}

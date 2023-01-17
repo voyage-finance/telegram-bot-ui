@@ -1,19 +1,10 @@
 import { useState } from "react";
-import Button from "@components/atoms/Button";
-import ConnectWalletModal from "../ConnectWalletModal";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const ConnectBtn: React.FC = () => {
   const [showOptions, setShowOptions] = useState(false);
 
-  return (
-    <>
-      <Button onClick={() => setShowOptions(true)}>Connect wallet</Button>
-      <ConnectWalletModal
-        opened={showOptions}
-        onClose={() => setShowOptions(false)}
-      />
-    </>
-  );
+  return <ConnectButton />;
 };
 
 export default ConnectBtn;
