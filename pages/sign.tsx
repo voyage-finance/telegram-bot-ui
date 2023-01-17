@@ -9,6 +9,9 @@ import copy from "copy-to-clipboard";
 import CopyTooltip from "@components/atoms/CopyTooltip";
 import { Copy } from "tabler-icons-react";
 import WalletConnectionFence from "@components/moleculas/WalletConnectionFence";
+import { GetServerSideProps } from "next";
+import { getSession } from "next-auth/react";
+import { getToken } from "next-auth/jwt";
 
 interface ISignPageProps {}
 
@@ -96,6 +99,23 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
       </Stack>
     </WalletConnectionFence>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context);
+  const token = await getToken({ req: context.req });
+
+  const address = token?.sub ?? null;
+
+  console.log("session", session);
+  console.log("token", token);
+
+  return {
+    props: {
+      address,
+      session,
+    },
+  };
 };
 
 export default SignPage;
