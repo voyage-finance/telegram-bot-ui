@@ -1,11 +1,11 @@
 export const submitUserVerify = async (
-  id: number,
+  id: string,
   message: string,
   signature: string
 ) => {
-  const data = { id, message, signature };
+  const data = { id: Number.parseInt(id), message, signature };
 
-  return await fetch((process.env as any).API_URL, {
+  return await fetch(`/api/verify`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
