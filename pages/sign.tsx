@@ -12,6 +12,7 @@ import WalletConnectionFence from "@components/moleculas/WalletConnectionFence";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { getToken } from "next-auth/jwt";
+import { submitUserVerify } from "api";
 
 interface ISignPageProps {}
 
@@ -24,27 +25,32 @@ function hexToBytes(hex: string) {
 const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
   const router = useRouter();
 
-  const { message, name } = router.query as any;
-  const [copied, setCopied] = React.useState(false);
-
+  const { message, name, msg_id } = router.query as any;
+  const [error, setError] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
   const recoveredAddress = React.useRef<string>();
   const {
     data: signedData,
-    error,
+    error: signError,
     isLoading,
     signMessage,
   } = useSignMessage({
-    onSuccess(data, variables) {
-      // Verify signature when sign message succeeds
-      const address = verifyMessage(variables.message, data);
-      recoveredAddress.current = address;
+    async onSuccess(data, variables) {
+      try {
+        const address = verifyMessage(variables.message, data);
+        recoveredAddress.current = address;
+        setLoading(true);
+        const response = await submitUserVerify(msg_id, message, data);
+        setLoading(false);
+        if (response.ok) router.push("/sign-success");
+        else
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+      } catch (e: any) {
+        setLoading(false);
+        setError(e.message);
+      }
     },
   });
-
-  const onCopy = () => {
-    copy(`/submitowner ${name} ${message} ${signedData}`);
-    setCopied(true);
-  };
 
   const onSign = () => {
     const bytesValue: Uint8Array = hexToBytes(
@@ -63,39 +69,14 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
         }}
         align="center"
       >
-        {signedData ? (
-          <>
-            <Card sx={{ padding: 14, maxWidth: 600 }}>
-              <Text
-                sx={{ wordBreak: "break-all" }}
-              >{`/submitowner ${name} ${message} ${signedData}`}</Text>
-            </Card>
-            <CopyTooltip copied={copied}>
-              <Group
-                sx={{
-                  cursor: "pointer",
-                  padding: 4,
-                  paddingInline: 12,
-                  background: "rgba(255, 255, 255, 0.1)",
-                  borderRadius: 4,
-                }}
-                onMouseLeave={() => setCopied(false)}
-                onClick={onCopy}
-                {...props}
-              >
-                <Copy style={{ color: "white" }} /> <Text> Copy</Text>
-              </Group>
-            </CopyTooltip>
-          </>
-        ) : (
-          <>
-            <Card sx={{ padding: 14, maxWidth: 600 }}>
-              <Text sx={{ wordBreak: "break-all" }}>{message}</Text>
-            </Card>
-            <Button onClick={onSign}>Sign Message</Button>
-          </>
-        )}
-        {error && <Text type="danger">{error.message}</Text>}
+        <Card sx={{ padding: 14, maxWidth: 600 }}>
+          <Text sx={{ wordBreak: "break-all" }}>{message}</Text>
+        </Card>
+        <Button onClick={onSign} loading={loading}>
+          Sign Message
+        </Button>
+        {signError && <Text type="danger">{signError.message}</Text>}
+        {error && <Text type="danger">{error}</Text>}
       </Stack>
     </WalletConnectionFence>
   );
