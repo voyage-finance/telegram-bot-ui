@@ -1,18 +1,17 @@
 import { Button, Text } from "@components/atoms";
 import Card from "@components/moleculas/Card";
-import { Avatar, Box, Group, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import { verifyMessage } from "ethers/lib/utils.js";
 import { useRouter } from "next/dist/client/router";
 import * as React from "react";
-import { useSignMessage } from "wagmi";
-import copy from "copy-to-clipboard";
-import CopyTooltip from "@components/atoms/CopyTooltip";
-import { Copy } from "tabler-icons-react";
+import { useAccount, useSignMessage } from "wagmi";
 import WalletConnectionFence from "@components/moleculas/WalletConnectionFence";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { getToken } from "next-auth/jwt";
 import { submitUserVerify } from "api";
+import { chainId } from "@utils/config";
+import { SiweMessage } from "siwe";
 
 interface ISignPageProps {}
 
@@ -22,9 +21,21 @@ function hexToBytes(hex: string) {
   return bytes;
 }
 
+function createSiweMessage(address: string, statement: string) {
+  const siweMessage = new SiweMessage({
+    domain: window.location.origin,
+    address,
+    statement,
+    uri: origin,
+    version: "1",
+    chainId: chainId,
+  });
+  return siweMessage.prepareMessage();
+}
+
 const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
   const router = useRouter();
-
+  const { address } = useAccount();
   const { message, name, msg_id } = router.query as any;
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -53,11 +64,11 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
   });
 
   const onSign = () => {
-    const bytesValue: Uint8Array = hexToBytes(
-      (message as string).slice(2)
-    ) as any;
+    // const bytesValue: Uint8Array = hexToBytes(
+    //   createSiweMessage(address!, message) as string
+    // ) as any;
 
-    signMessage({ message: bytesValue });
+    signMessage({ message: createSiweMessage(address!, message) });
   };
 
   return (
