@@ -51,7 +51,11 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
         const address = verifyMessage(variables.message, data);
         recoveredAddress.current = address;
         setLoading(true);
-        const response = await submitUserVerify(msg_id, message, data);
+        const response = await submitUserVerify(
+          msg_id,
+          variables.message.toString(),
+          data
+        );
         setLoading(false);
         if (response.ok) router.push("/sign-success");
         else
