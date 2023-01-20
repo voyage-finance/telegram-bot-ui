@@ -23,10 +23,10 @@ function hexToBytes(hex: string) {
 
 function createSiweMessage(address: string, statement: string) {
   const siweMessage = new SiweMessage({
-    domain: window.location.origin,
+    domain: window.location.hostname,
     address,
     statement,
-    uri: origin,
+    uri: window.location.origin,
     version: "1",
     chainId: chainId,
   });
