@@ -1,8 +1,23 @@
 import ConnectBtn from "@components/moleculas/WalletNavItem/ConnectBtn";
 import { Stack } from "@mantine/core";
+import { fetchSigner } from "@wagmi/core";
 import Head from "next/head";
+import { useEffect } from "react";
+import { SafeService } from "services/safeSdk";
+import { useSigner } from "wagmi";
 
 export default function Home() {
+  const { data: signer } = useSigner();
+  useEffect(() => {
+    const initialize = async () => {
+      SafeService.instance().initialize(signer);
+      console.log(
+        "getOwners",
+        await (await SafeService.instance().sdk()).getOwners()
+      );
+    };
+    if (signer) initialize();
+  }, [signer]);
   return (
     <>
       <Head>

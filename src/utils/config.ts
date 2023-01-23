@@ -6,6 +6,8 @@ export const CHAIN_ID_NETWORK: Record<ChainID, Network> = {
   [ChainID.Hardhat]: Network.Hardhat,
 };
 
+export const alchemyApiKey = "IG5Is2xWE1WkB-h0cN1NX58xw_74WEZj";
+
 export const chainId: ChainID = 137;
 
 export const network: Network = CHAIN_ID_NETWORK[chainId];
