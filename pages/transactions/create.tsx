@@ -6,6 +6,7 @@ import {
   SafeTransactionDataPartial,
 } from "@safe-global/safe-core-sdk-types";
 import { fetchSigner } from "@wagmi/core";
+import { ethers } from "ethers";
 import Head from "next/head";
 import { useEffect } from "react";
 import { SafeService } from "services/safeSdk";
@@ -26,6 +27,9 @@ export default function Home() {
   const onCreate = async () => {
     const safe = await SafeService.instance().sdk();
     const service = await SafeService.instance().service();
+    const safeAddress = ethers.utils.getAddress(
+      "0x775ad9c18e0d8de7dfcffc8540a0203f61b39a7e"
+    );
     const safeTransactionData: SafeTransactionDataPartial = {
       to: "0x11a9074399b103E1d3D18e63359D35541fe05b55",
       value: "1", // 1 wei
@@ -35,6 +39,7 @@ export default function Home() {
     const safeTransaction = await safe.createTransaction({
       safeTransactionData,
     });
+    console.log("- safeAddress:", safeAddress);
     console.log("- safeTransaction:", safeTransaction);
 
     const senderAddress = await signer!.getAddress();
@@ -46,7 +51,7 @@ export default function Home() {
 
     // Propose transaction to the service
     await service.proposeTransaction({
-      safeAddress: "0x775ad9c18e0d8de7dfcffc8540a0203f61b39a7e".toLowerCase(),
+      safeAddress,
       safeTransactionData: safeTransaction.data,
       safeTxHash,
       senderAddress,
