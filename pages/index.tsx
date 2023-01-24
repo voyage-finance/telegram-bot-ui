@@ -7,17 +7,17 @@ import { SafeService } from "services/safeSdk";
 import { useSigner } from "wagmi";
 
 export default function Home() {
-  const { data: signer } = useSigner();
-  useEffect(() => {
-    const initialize = async () => {
-      SafeService.instance().initialize(signer);
-      console.log(
-        "getOwners",
-        await (await SafeService.instance().sdk()).getOwners()
-      );
-    };
-    if (signer) initialize();
-  }, [signer]);
+  // const { data: signer } = useSigner();
+  // // useEffect(() => {
+  // //   const initialize = async () => {
+  // //     SafeService.instance().initialize(signer);
+  // //     console.log(
+  // //       "getOwners",
+  // //       await (await SafeService.instance().sdk()).getOwners()
+  // //     );
+  // //   };
+  // //   if (signer) initialize();
+  // // }, [signer]);
   return (
     <>
       <Head>

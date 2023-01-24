@@ -1,22 +1,17 @@
-import {
-  SafeAccountConfig,
-  SafeDeploymentConfig,
-  SafeFactory,
-} from "@safe-global/safe-core-sdk";
 import Safe from "@safe-global/safe-core-sdk";
 import EthersAdapter from "@safe-global/safe-ethers-lib";
-import { alchemyApiKey, chainId } from "@utils/config";
 import { ethers } from "ethers";
+import SafeServiceClient from "@safe-global/safe-service-client";
 
 export class SafeService {
   private static _instance: SafeService | undefined;
   private static safeSdk: Safe | undefined;
-
+  private static service: SafeServiceClient;
   private constructor() {
     // Private constructor ensures singleton instance
   }
 
-  async initialize(signer: any) {
+  async initialize(signer: any, safeAddress: string) {
     console.log("signer", signer);
 
     const ethAdapter = new EthersAdapter({
@@ -26,8 +21,14 @@ export class SafeService {
 
     SafeService.safeSdk = await Safe.create({
       ethAdapter,
-      safeAddress: "0x775ad9c18e0d8de7dfcffc8540a0203f61b39a7e",
+      safeAddress,
     });
+
+    SafeService.service = new SafeServiceClient({
+      txServiceUrl: "https://safe-transaction-mainnet.safe.global",
+      ethAdapter,
+    });
+
     return SafeService.safeSdk;
   }
 
@@ -37,6 +38,14 @@ export class SafeService {
     }
 
     return SafeService.safeSdk;
+  }
+
+  async service() {
+    if (!SafeService.service) {
+      throw new Error("SDK requested before initialization");
+    }
+
+    return SafeService.service;
   }
 
   static instance(): SafeService {
