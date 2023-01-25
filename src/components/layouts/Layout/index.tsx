@@ -1,4 +1,5 @@
 import { AppShell, MantineProvider } from "@mantine/core";
+import { NotificationsProvider } from "@mantine/notifications";
 import React from "react";
 import Navigation from "./Navigation";
 import { useRouter } from "next/router";
@@ -91,41 +92,43 @@ const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         },
       }}
     >
-      <AppShell
-        header={<Navigation />}
-        styles={(theme) => ({
-          root: {
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "100%",
-            width: "100%",
-          },
-          body: {
-            display: "flex",
-            flexDirection: "column",
-            flex: "1 0",
-            width: "100%",
-            overflowY: "auto",
-            background: isOnboardingFlow
-              ? `url('./onboarding-bg.png')`
-              : theme.fn.linearGradient(180, "#333c62", "#25283d"),
-            backgroundSize: "cover",
-          },
-          main: {
-            display: "flex",
-            flexDirection: "column",
-            width: "100%",
-            ...(isOnboardingFlow
-              ? {
-                  justifyContent: "center",
-                  alignItems: "center",
-                }
-              : {}),
-          },
-        })}
-      >
-        {children}
-      </AppShell>
+      <NotificationsProvider position="top-right">
+        <AppShell
+          header={<Navigation />}
+          styles={(theme) => ({
+            root: {
+              display: "flex",
+              flexDirection: "column",
+              minHeight: "100%",
+              width: "100%",
+            },
+            body: {
+              display: "flex",
+              flexDirection: "column",
+              flex: "1 0",
+              width: "100%",
+              overflowY: "auto",
+              background: isOnboardingFlow
+                ? `url('./onboarding-bg.png')`
+                : theme.fn.linearGradient(180, "#333c62", "#25283d"),
+              backgroundSize: "cover",
+            },
+            main: {
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
+              ...(isOnboardingFlow
+                ? {
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }
+                : {}),
+            },
+          })}
+        >
+          {children}
+        </AppShell>
+      </NotificationsProvider>
     </MantineProvider>
   );
 };

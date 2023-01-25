@@ -25,7 +25,7 @@ export class SafeService {
     });
 
     SafeService.service = new SafeServiceClient({
-      txServiceUrl: "https://safe-transaction-mainnet.safe.global",
+      txServiceUrl: "https://safe-transaction-polygon.safe.global",
       ethAdapter,
     });
 

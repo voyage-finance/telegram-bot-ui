@@ -2,15 +2,14 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import Layout from "@components/layouts/Layout";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
+import { polygon } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import {
   RainbowKitSiweNextAuthProvider,
   GetSiweMessageOptions,
 } from "@rainbow-me/rainbowkit-siwe-next-auth";
-import { getCsrfToken, SessionProvider } from "next-auth/react";
-
+import { SessionProvider } from "next-auth/react";
 import {
   darkTheme,
   getDefaultWallets,
