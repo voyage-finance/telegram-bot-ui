@@ -6,14 +6,14 @@ import WrongNetworkBanner from "./WrongNetworkBanner";
 import Link from "next/link";
 import React, { ReactEventHandler } from "react";
 import WalletNavItem from "@components/moleculas/WalletNavItem";
-import { Text } from "@components/atoms";
+import { Divider, Text } from "@components/atoms";
+import NavLink from "@components/moleculas/NavLink";
 
 const HEADER_HEIGHT = 48;
 
 const useStyles = createStyles(() => ({
   logo: {
     display: "flex",
-    flex: "1 0 auto",
     alignItems: "center",
     marginRight: 50,
   },
@@ -63,16 +63,27 @@ const Navigation: React.FC = () => {
         <Group
           sx={{
             height: "100%",
-            justifyContent: "space-between",
             padding: "0 16px",
           }}
         >
           <Box className={classes.logo}>
             <Text weight="bold">Voyage Safe</Text>
-            {/* <Link href="/">
-              <Logo />
-            </Link> */}
           </Box>
+          <Group sx={{ height: "100%" }}>
+            <NavLink
+              href="/safes/0x775ad9c18e0d8de7dfcffc8540a0203f61b39a7e/transactions"
+              exact
+            >
+              Transactions
+            </NavLink>
+          </Group>
+          <Divider
+            sx={{
+              marginLeft: "auto",
+            }}
+            size="sm"
+            orientation="vertical"
+          />
           <Box className={classes.wallet}>
             <WalletNavItem />
           </Box>
