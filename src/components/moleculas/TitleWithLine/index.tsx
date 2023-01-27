@@ -5,7 +5,7 @@ import cn from "classnames";
 import { X } from "tabler-icons-react";
 
 interface IProps extends GroupProps {
-  size?: "lg" | "md";
+  size?: "lg" | "md" | "s" | "xs";
   showClose?: boolean;
 }
 
@@ -16,7 +16,13 @@ const TitleWithLine: React.FunctionComponent<IProps> = ({
 }) => {
   return (
     <Group align="center" spacing={11} {...props}>
-      <Title className={cn(styles.title, size == "md" && styles.md)}>
+      <Title
+        className={cn(
+          styles.title,
+          size == "md" && styles.md,
+          size == "xs" && styles.xs
+        )}
+      >
         {props.children}
       </Title>
       <span className={styles.line} />

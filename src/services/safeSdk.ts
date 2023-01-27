@@ -11,7 +11,7 @@ export class SafeService {
     // Private constructor ensures singleton instance
   }
 
-  async initialize(signer: any, safeAddress: string) {
+  async initialize(signer: any, safeAddress?: string) {
     console.log("signer", signer);
 
     const ethAdapter = new EthersAdapter({
@@ -19,10 +19,11 @@ export class SafeService {
       signerOrProvider: signer,
     });
 
-    SafeService.safeSdk = await Safe.create({
-      ethAdapter,
-      safeAddress,
-    });
+    if (safeAddress)
+      SafeService.safeSdk = await Safe.create({
+        ethAdapter,
+        safeAddress,
+      });
 
     SafeService.service = new SafeServiceClient({
       txServiceUrl: "https://safe-transaction-polygon.safe.global",
@@ -32,7 +33,7 @@ export class SafeService {
     return SafeService.safeSdk;
   }
 
-  async sdk() {
+  sdk() {
     if (!SafeService.safeSdk) {
       throw new Error("SDK requested before initialization");
     }
@@ -40,12 +41,20 @@ export class SafeService {
     return SafeService.safeSdk;
   }
 
-  async service() {
+  service() {
     if (!SafeService.service) {
-      throw new Error("SDK requested before initialization");
+      throw new Error("service requested before initialization");
     }
 
     return SafeService.service;
+  }
+
+  isServiceReady(): boolean {
+    return SafeService.service != undefined;
+  }
+
+  isSdkReady() {
+    return SafeService.safeSdk != undefined;
   }
 
   static instance(): SafeService {

@@ -66,17 +66,9 @@ const Navigation: React.FC = () => {
             padding: "0 16px",
           }}
         >
-          <Box className={classes.logo}>
+          <a className={classes.logo} href="/">
             <Text weight="bold">Voyage Safe</Text>
-          </Box>
-          <Group sx={{ height: "100%" }}>
-            <NavLink
-              href="/safes/0x775ad9c18e0d8de7dfcffc8540a0203f61b39a7e/transactions"
-              exact
-            >
-              Transactions
-            </NavLink>
-          </Group>
+          </a>
           <Divider
             sx={{
               marginLeft: "auto",

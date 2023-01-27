@@ -16,6 +16,7 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
+import SafeContext from "@components/layouts/Layout/SafeContext";
 
 const { chains, provider } = configureChains(
   [polygon],
