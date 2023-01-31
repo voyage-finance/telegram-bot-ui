@@ -1,17 +1,17 @@
 import { Button, Text } from "@components/atoms";
 import Card from "@components/moleculas/Card";
-import { Stack } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import { verifyMessage } from "ethers/lib/utils.js";
 import { useRouter } from "next/dist/client/router";
 import * as React from "react";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useNetwork, useSignMessage } from "wagmi";
 import WalletConnectionFence from "@components/moleculas/WalletConnectionFence";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { getToken } from "next-auth/jwt";
 import { submitUserVerify } from "api";
-import { chainId } from "@utils/config";
 import { SiweMessage } from "siwe";
+import TitleWithLine from "@components/moleculas/TitleWithLine";
 
 interface ISignPageProps {}
 
@@ -21,14 +21,18 @@ function hexToBytes(hex: string) {
   return bytes;
 }
 
-function createSiweMessage(address: string, statement: string) {
+function createSiweMessage(
+  address: string,
+  statement: string,
+  chainId?: number
+) {
   const siweMessage = new SiweMessage({
     domain: window.location.hostname,
     address,
     statement,
     uri: window.location.origin,
     version: "1",
-    chainId: chainId,
+    chainId,
   });
   return siweMessage.prepareMessage();
 }
@@ -39,7 +43,12 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
   const { message, name, msg_id } = router.query as any;
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const { chain } = useNetwork();
+
   const recoveredAddress = React.useRef<string>();
+
+  const [siweMessage, setSiweMessage] = React.useState("");
+
   const {
     data: signedData,
     error: signError,
@@ -57,7 +66,7 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
           data
         );
         setLoading(false);
-        if (response.ok) router.push("/sign-success");
+        if (response.ok) router.push("/sign/success");
         else
           throw new Error(`Error: ${response.status} ${response.statusText}`);
       } catch (e: any) {
@@ -72,8 +81,14 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
     //   createSiweMessage(address!, message) as string
     // ) as any;
 
-    signMessage({ message: createSiweMessage(address!, message) });
+    signMessage({ message: siweMessage });
   };
+
+  React.useEffect(() => {
+    const siweMsg = createSiweMessage(address!, message, chain?.id);
+    console.log(siweMsg);
+    setSiweMessage(siweMsg);
+  }, []);
 
   return (
     <WalletConnectionFence>
@@ -82,14 +97,23 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
         sx={{
           marginInline: "auto",
         }}
-        align="center"
+        align="start"
       >
-        <Card sx={{ padding: 14, maxWidth: 600 }}>
-          <Text sx={{ wordBreak: "break-all" }}>{message}</Text>
+        <TitleWithLine w="100%">Signature Request</TitleWithLine>
+        <Text type="secondary">Message</Text>
+        <Card w={350} py={70} px={22}>
+          <Text sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+            {siweMessage}
+          </Text>
         </Card>
-        <Button onClick={onSign} loading={loading}>
-          Sign Message
-        </Button>
+        <Group w="100%">
+          <Button onClick={() => undefined} kind="secondary" sx={{ flex: 1 }}>
+            Reject
+          </Button>
+          <Button onClick={onSign} loading={loading} sx={{ flex: 1 }}>
+            Sign Message
+          </Button>
+        </Group>
         {signError && <Text type="danger">{signError.message}</Text>}
         {error && <Text type="danger">{error}</Text>}
       </Stack>
