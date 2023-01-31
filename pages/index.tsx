@@ -1,4 +1,5 @@
 import SafeContext from "@components/layouts/Layout/SafeContext";
+import { SafeServiceProvider } from "@components/layouts/SafeServiceProvider";
 import ConnectBtn from "@components/moleculas/WalletNavItem/ConnectBtn";
 import Safes from "@components/organisms/Safes";
 import { Stack } from "@mantine/core";
@@ -29,9 +30,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <SafeContext>
-          <Safes />
-        </SafeContext>
+        <Safes />
       </main>
     </>
   );

@@ -1,14 +1,10 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import Layout from "@components/layouts/Layout";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { configureChains, createClient, mainnet, WagmiConfig } from "wagmi";
 import { polygon } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
-import {
-  RainbowKitSiweNextAuthProvider,
-  GetSiweMessageOptions,
-} from "@rainbow-me/rainbowkit-siwe-next-auth";
 import { SessionProvider } from "next-auth/react";
 import {
   darkTheme,
@@ -16,10 +12,10 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
-import SafeContext from "@components/layouts/Layout/SafeContext";
+import { SafeServiceProvider } from "@components/layouts/SafeServiceProvider";
 
 const { chains, provider } = configureChains(
-  [polygon],
+  [polygon, mainnet],
   [
     alchemyProvider({ apiKey: "IG5Is2xWE1WkB-h0cN1NX58xw_74WEZj" }),
     publicProvider(),
@@ -37,33 +33,27 @@ const wagmiClient = createClient({
   provider,
 });
 
-const getSiweMessageOptions: GetSiweMessageOptions = () => ({
-  statement: "Sign in to Voyage app.",
-});
-
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig client={wagmiClient}>
       <SessionProvider refetchInterval={0} session={pageProps.session}>
-        <RainbowKitSiweNextAuthProvider
-          getSiweMessageOptions={getSiweMessageOptions}
+        <RainbowKitProvider
+          chains={chains}
+          showRecentTransactions={true}
+          theme={darkTheme({
+            accentColor: "#FF9034",
+            accentColorForeground: "white",
+            borderRadius: "small",
+            fontStack: "system",
+            overlayBlur: "small",
+          })}
         >
-          <RainbowKitProvider
-            chains={chains}
-            showRecentTransactions={true}
-            theme={darkTheme({
-              accentColor: "#FF9034",
-              accentColorForeground: "white",
-              borderRadius: "small",
-              fontStack: "system",
-              overlayBlur: "small",
-            })}
-          >
+          <SafeServiceProvider>
             <Layout>
               <Component {...pageProps} />
             </Layout>
-          </RainbowKitProvider>
-        </RainbowKitSiweNextAuthProvider>
+          </SafeServiceProvider>
+        </RainbowKitProvider>
       </SessionProvider>
     </WagmiConfig>
   );

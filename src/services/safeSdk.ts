@@ -2,17 +2,23 @@ import Safe from "@safe-global/safe-core-sdk";
 import EthersAdapter from "@safe-global/safe-ethers-lib";
 import { ethers } from "ethers";
 import SafeServiceClient from "@safe-global/safe-service-client";
+import { Network } from "@types";
+import { Signer } from "@wagmi/core";
 
 export class SafeService {
   private static _instance: SafeService | undefined;
   private static safeSdk: Safe | undefined;
-  private static service: SafeServiceClient;
+  private static service: SafeServiceClient | undefined;
+  private static signer: Signer | undefined;
   private constructor() {
     // Private constructor ensures singleton instance
   }
 
-  async initialize(signer: any, safeAddress?: string) {
-    console.log("signer", signer);
+  async initialize(network: Network, signer: any, safeAddress?: string) {
+    SafeService.safeSdk = undefined;
+    SafeService.service = undefined;
+
+    SafeService.signer = signer;
 
     const ethAdapter = new EthersAdapter({
       ethers,
@@ -25,12 +31,15 @@ export class SafeService {
         safeAddress,
       });
 
+    const txServiceUrl = `https://safe-transaction-${network}.safe.global`;
+    console.log(`Initializing safe service with link ${txServiceUrl}`);
+
     SafeService.service = new SafeServiceClient({
-      txServiceUrl: "https://safe-transaction-polygon.safe.global",
+      txServiceUrl,
       ethAdapter,
     });
 
-    return SafeService.safeSdk;
+    return [SafeService.safeSdk, SafeService.service] as const;
   }
 
   sdk() {
@@ -39,6 +48,14 @@ export class SafeService {
     }
 
     return SafeService.safeSdk;
+  }
+
+  signer() {
+    if (!SafeService.signer) {
+      throw new Error("signer requested before initialization");
+    }
+
+    return SafeService.signer;
   }
 
   service() {

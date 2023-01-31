@@ -1,18 +1,22 @@
 import { Text } from "@components/atoms";
-import SafeContext from "@components/layouts/Layout/SafeContext";
+import {
+  SafeServiceProvider,
+  useSafeService,
+} from "@components/layouts/SafeServiceProvider";
 import Card from "@components/moleculas/Card";
 import TitleWithLine from "@components/moleculas/TitleWithLine";
-import { Stack } from "@mantine/core";
+import { LoadingOverlay, Stack } from "@mantine/core";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { SafeService } from "services/safeSdk";
-import { useAccount } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 
 interface ISafesProps {}
 
 const Safes: React.FunctionComponent<ISafesProps> = (props) => {
   const [safes, setSafes] = React.useState<string[]>([]);
   const { address } = useAccount();
+  const { chain } = useNetwork();
   const router = useRouter();
 
   const fetchSafes = async (address: string) => {
@@ -24,12 +28,29 @@ const Safes: React.FunctionComponent<ISafesProps> = (props) => {
     }
   };
 
+  // React.useEffect(() => {
+  //   console.log("address", address);
+  //   console.log(
+  //     "SafeService.instance().isServiceReady()",
+  //     SafeService.instance().isServiceReady()
+  //   );
+  //   if (address) fetchSafes(address);
+  // }, [SafeService.instance().isServiceReady()]);
+
+  const { service, isLoading } = useSafeService();
+
   React.useEffect(() => {
+    console.log("service", service);
+    console.log("isLoading", isLoading);
+    if (!service) {
+      setSafes([]);
+    }
     if (address) fetchSafes(address);
-  }, [address]);
+  }, [service, isLoading]);
 
   return (
     <Stack w={500} mx="auto" my="auto">
+      <LoadingOverlay visible={isLoading} />
       <TitleWithLine>Safes</TitleWithLine>
       {safes.map((safe) => (
         <div
@@ -50,6 +71,7 @@ const Safes: React.FunctionComponent<ISafesProps> = (props) => {
           </Card>
         </div>
       ))}
+      {safes.length == 0 && <Text>No safes on this network</Text>}
     </Stack>
   );
 };

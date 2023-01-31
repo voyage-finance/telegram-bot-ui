@@ -6,14 +6,12 @@ export enum Environment {
 
 export enum Network {
   Mainnet = "mainnet",
-  Goerli = "goerli",
-  Hardhat = "hardhat",
+  Polygon = "polygon",
 }
 
 export enum ChainID {
   Mainnet = 1,
-  Goerli = 5,
-  Hardhat = 31337,
+  Polygon = 137,
 }
 
 export enum MessageAction {
