@@ -2,8 +2,9 @@ import { Box, createStyles, Group, Stack, Header } from "@mantine/core";
 import Image from "next/image";
 import { useIsMounted } from "@utils/hooks";
 import React, { ReactEventHandler } from "react";
-import WalletNavItem from "@components/moleculas/WalletNavItem";
+import WalletNavItem from "@components/moleculas/ConnectBtn";
 import { Divider, Text } from "@components/atoms";
+import ConnectBtn from "@components/moleculas/ConnectBtn";
 
 const HEADER_HEIGHT = 48;
 
@@ -69,7 +70,7 @@ const Navigation: React.FC = () => {
             orientation="vertical"
           />
           <Box className={classes.wallet}>
-            <WalletNavItem />
+            <ConnectBtn />
           </Box>
         </Group>
       </Header>

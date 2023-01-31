@@ -2,7 +2,7 @@ import { Text } from "@components/atoms";
 import { BoxProps, Center, Stack } from "@mantine/core";
 import { useIsMounted } from "@utils/hooks";
 import { useAccount } from "wagmi";
-import ConnectBtn from "../WalletNavItem/ConnectBtn";
+import ConnectBtn from "../ConnectBtn";
 
 const WalletConnectionFence: React.FC<BoxProps> = ({ children, ...props }) => {
   const isMounted = useIsMounted();

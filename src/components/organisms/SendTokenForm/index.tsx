@@ -1,6 +1,6 @@
 import { Button, Text } from "@components/atoms";
 import Card from "@components/moleculas/Card";
-import ConnectBtn from "@components/moleculas/WalletNavItem/ConnectBtn";
+import ConnectBtn from "@components/moleculas/ConnectBtn";
 import { Group, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
