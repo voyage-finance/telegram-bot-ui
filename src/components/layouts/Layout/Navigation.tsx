@@ -1,13 +1,9 @@
 import { Box, createStyles, Group, Stack, Header } from "@mantine/core";
-import { useIsWrongNetwork } from "@hooks";
 import Image from "next/image";
 import { useIsMounted } from "@utils/hooks";
-import WrongNetworkBanner from "./WrongNetworkBanner";
-import Link from "next/link";
 import React, { ReactEventHandler } from "react";
 import WalletNavItem from "@components/moleculas/WalletNavItem";
 import { Divider, Text } from "@components/atoms";
-import NavLink from "@components/moleculas/NavLink";
 
 const HEADER_HEIGHT = 48;
 
