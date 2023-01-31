@@ -45,19 +45,15 @@ Logo.displayName = "Logo";
 
 const Navigation: React.FC = () => {
   const { classes } = useStyles();
-  const [isWrongNetwork] = useIsWrongNetwork();
   const isMounted = useIsMounted();
-  const showWrongNetworkBanner = isWrongNetwork && isMounted;
   return (
     <Stack>
-      {isWrongNetwork && isMounted && <WrongNetworkBanner />}
       <Header
         height={HEADER_HEIGHT}
         sx={(theme) => ({
           flex: "1 0 auto",
           backgroundColor: theme.colors.dark[6],
           border: "none",
-          top: showWrongNetworkBanner ? HEADER_HEIGHT : 0,
         })}
       >
         <Group
