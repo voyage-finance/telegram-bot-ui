@@ -26,4 +26,17 @@ export const submitSetup = async (
     body: JSON.stringify(data),
   });
 };
-//tbc...
+
+export const notifyTransaction = async (
+  txId: string,
+  chain: string,
+  chatId: string
+) => {
+  const data = { txId, chain, chatId };
+
+  return await fetch(`/api/notification/request`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+};

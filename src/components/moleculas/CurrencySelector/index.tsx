@@ -39,7 +39,13 @@ const CurrencySelector: React.FunctionComponent<{
             }
       );
       setTokens(tokens);
-      const preselectedToken = tokens.find((t) => t.token.name);
+      console.log("tokens", tokens);
+      console.log("preselectedCurrency", preselectedCurrency);
+
+      const preselectedToken = tokens.find(
+        (t) =>
+          t.token.symbol.toLowerCase() == preselectedCurrency?.toLowerCase()
+      );
       if (preselectedToken) {
         onChange?.(preselectedToken);
       }

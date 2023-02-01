@@ -23,12 +23,14 @@ const SafeServiceContext = createContext<{
   safeAddress: string;
   isLoading: boolean;
   urlChainId: number;
+  chainPrefix: string;
 }>({
   service: undefined,
   sdk: undefined,
   isLoading: false,
   safeAddress: "",
   urlChainId: 1,
+  chainPrefix: "",
 });
 
 export const SafeServiceProvider: React.FC<PropsWithChildren> = ({
@@ -98,6 +100,7 @@ export const SafeServiceProvider: React.FC<PropsWithChildren> = ({
         isLoading,
         safeAddress,
         urlChainId,
+        chainPrefix: prefix,
       }}
     >
       <WalletConnectionFence>

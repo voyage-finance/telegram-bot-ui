@@ -18,17 +18,19 @@ import { useSafeService } from "@components/layouts/SafeServiceProvider";
 import { SafeBalanceResponse } from "@safe-global/safe-service-client";
 import { buildTransaction } from "@utils/transaction";
 import { checkAddressChecksum } from "ethereum-checksum-address";
+import { notifyTransaction } from "api";
 
 const SendTokenForm: React.FC<{
   amount?: string;
   to?: string;
   currency?: string;
-}> = ({ amount, to, currency }) => {
+  chatId?: string;
+}> = ({ amount, to, chatId, currency }) => {
   const { data: signer } = useSigner();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const { service, sdk, safeAddress } = useSafeService();
+  const { service, sdk, safeAddress, chainPrefix } = useSafeService();
 
   const form = useForm({
     initialValues: {
@@ -75,7 +77,8 @@ const SendTokenForm: React.FC<{
         console.log("safeTransaction", safeTransaction);
 
         const senderAddress = await signer!.getAddress();
-        const safeTxHash = await sdk.getTransactionHash(safeTransaction);
+        const safeTxHash =
+          "0x2dc849432a49ee80d83210f54c81823f3b73ce1fe66ebeeefdb5734b4293ca1e"; // await sdk.getTransactionHash(safeTransaction);
         const signature = await sdk.signTransactionHash(safeTxHash);
 
         console.log("safeTxHash", safeTxHash);
@@ -92,8 +95,11 @@ const SendTokenForm: React.FC<{
 
         showNotification({
           message: <Text size="lg">Transaction is submitted successfully</Text>,
-          autoClose: 1000,
+          autoClose: 3000,
         });
+
+        const txId = `multisig_${safeAddress}_${safeTxHash}`;
+        await notifyTransaction(txId, chainPrefix, chatId!);
         form.setValues({ address: "", amount: "" });
       }
     } catch (e: any) {
@@ -124,6 +130,7 @@ const SendTokenForm: React.FC<{
       >
         <div>
           <CurrencySelector
+            preselectedCurrency={currency}
             walletAddress={safeAddress}
             value={form.values.selectedToken}
             onChange={(value) => form.setFieldValue("selectedToken", value)}

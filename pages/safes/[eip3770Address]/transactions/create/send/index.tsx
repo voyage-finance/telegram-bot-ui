@@ -15,7 +15,8 @@ const SendPage: React.FunctionComponent<{
   amount?: string;
   to?: string;
   currency?: string;
-}> = ({ amount, to, currency }) => {
+  chatId?: string;
+}> = ({ amount, to, currency, chatId }) => {
   const [currentTab, setCurrentTab] = React.useState<TransferType>(
     TransferType.TOKEN
   );
@@ -56,7 +57,12 @@ const SendPage: React.FunctionComponent<{
           }}
         />
         {currentTab == TransferType.TOKEN && (
-          <SendTokenForm to={to} amount={amount} currency={currency} />
+          <SendTokenForm
+            to={to}
+            amount={amount}
+            currency={currency}
+            chatId={chatId}
+          />
         )}
         {currentTab == TransferType.NFT && <SendNftForm />}
       </Stack>
@@ -65,10 +71,15 @@ const SendPage: React.FunctionComponent<{
 };
 
 export async function getServerSideProps(context: any) {
-  const { amount, to, currency } = context.query;
+  const { amount, to, currency, chatId } = context.query;
 
   return {
-    props: { amount: amount || "", to: to || "", currency: currency || "" },
+    props: {
+      amount: amount || "",
+      to: to || "",
+      currency: currency || "",
+      chatId: chatId || "",
+    },
   };
 }
 
