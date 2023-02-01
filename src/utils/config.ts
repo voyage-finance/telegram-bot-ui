@@ -1,5 +1,5 @@
 import { ChainID, Network } from "@types";
-
+import { isValidEip3770NetworkPrefix } from "@safe-global/safe-core-sdk-utils";
 export const CHAIN_ID_NETWORK: Record<ChainID, Network> = {
   [ChainID.Mainnet]: Network.Mainnet,
   [ChainID.Polygon]: Network.Polygon,

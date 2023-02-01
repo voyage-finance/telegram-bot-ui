@@ -14,7 +14,6 @@ import TitleWithLine from "@components/moleculas/TitleWithLine";
 import CheckOrangeIcon from "@assets/icons/check-circle-orange.svg";
 import ArrowUpRightIcon from "@assets/icons/arrow-up-right-icon.svg";
 import styles from "./index.module.scss";
-import { SafeService } from "services/safeSdk";
 import { useSafeService } from "@components/layouts/SafeServiceProvider";
 import { getShortenedAddress } from "@utils/index";
 import { CHAIN_ID_NETWORK } from "@utils/config";
@@ -79,18 +78,12 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
   });
 
   const onSign = () => {
-    // const bytesValue: Uint8Array = hexToBytes(
-    //   createSiweMessage(address!, message) as string
-    // ) as any;
-
     signMessage({ message: siweMessage });
   };
 
   const fetchSafes = async (address: string) => {
-    if (SafeService.instance().isServiceReady()) {
-      const res = await SafeService.instance()
-        .service()
-        .getSafesByOwner(address);
+    if (service) {
+      const res = await service.getSafesByOwner(address);
       setSafes(res.safes);
     }
   };

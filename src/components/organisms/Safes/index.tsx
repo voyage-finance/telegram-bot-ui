@@ -1,14 +1,11 @@
 import { Text } from "@components/atoms";
-import {
-  SafeServiceProvider,
-  useSafeService,
-} from "@components/layouts/SafeServiceProvider";
+import { useSafeService } from "@components/layouts/SafeServiceProvider";
 import Card from "@components/moleculas/Card";
 import TitleWithLine from "@components/moleculas/TitleWithLine";
 import { LoadingOverlay, Stack } from "@mantine/core";
+import { getEip3770NetworkPrefixFromChainId } from "@safe-global/safe-core-sdk-utils";
 import { useRouter } from "next/router";
 import * as React from "react";
-import { SafeService } from "services/safeSdk";
 import { useAccount, useNetwork } from "wagmi";
 
 interface ISafesProps {}
@@ -16,32 +13,18 @@ interface ISafesProps {}
 const Safes: React.FunctionComponent<ISafesProps> = (props) => {
   const [safes, setSafes] = React.useState<string[]>([]);
   const { address } = useAccount();
-  const { chain } = useNetwork();
   const router = useRouter();
+  const { chain } = useNetwork();
+  const { service, isLoading } = useSafeService();
 
   const fetchSafes = async (address: string) => {
-    if (SafeService.instance().isServiceReady()) {
-      const res = await SafeService.instance()
-        .service()
-        .getSafesByOwner(address);
+    if (service) {
+      const res = await service.getSafesByOwner(address);
       setSafes(res.safes);
     }
   };
 
-  // React.useEffect(() => {
-  //   console.log("address", address);
-  //   console.log(
-  //     "SafeService.instance().isServiceReady()",
-  //     SafeService.instance().isServiceReady()
-  //   );
-  //   if (address) fetchSafes(address);
-  // }, [SafeService.instance().isServiceReady()]);
-
-  const { service, isLoading } = useSafeService();
-
   React.useEffect(() => {
-    console.log("service", service);
-    console.log("isLoading", isLoading);
     if (!service) {
       setSafes([]);
     }
@@ -56,7 +39,9 @@ const Safes: React.FunctionComponent<ISafesProps> = (props) => {
         <div
           key={safe}
           onClick={() => {
-            router.push(`/safes/${safe}`);
+            router.push(
+              `/safes/${getEip3770NetworkPrefixFromChainId(chain!.id)}:${safe}`
+            );
           }}
         >
           <Card

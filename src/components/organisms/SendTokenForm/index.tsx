@@ -7,27 +7,24 @@ import {
   OperationType,
   SafeTransactionDataPartial,
 } from "@safe-global/safe-core-sdk-types";
-import { fetchSigner } from "@wagmi/core";
 import { ethers } from "ethers";
-import Head from "next/head";
 import { useEffect, useState } from "react";
-import { SafeService } from "services/safeSdk";
 import { useSigner } from "wagmi";
-import BigNumber from "bignumber.js";
 import styles from "./styles.module.scss";
-import TitleWithLine from "@components/moleculas/TitleWithLine";
-import { formatAmount } from "@utils/bn";
 import { useRouter } from "next/router";
 import { showNotification } from "@mantine/notifications";
 import CurrencySelector from "@components/moleculas/CurrencySelector";
+import { useSafeService } from "@components/layouts/SafeServiceProvider";
+import { SafeBalanceResponse } from "@safe-global/safe-service-client";
 
 export default function SendTokenForm() {
   const { data: signer } = useSigner();
-  const router = useRouter();
-  const { safeAddress } = router.query;
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { service, sdk, safeAddress } = useSafeService();
+
+  const [selectedToken, setSelectedToken] = useState<SafeBalanceResponse>();
 
   const form = useForm({
     initialValues: {
@@ -51,53 +48,62 @@ export default function SendTokenForm() {
   const handleFormSubmit = async () => {
     try {
       setIsLoading(true);
-      const safe = await SafeService.instance().sdk();
-      const service = await SafeService.instance().service();
-      const nonce = await safe.getNonce();
-      const safeAddressChecksummed = ethers.utils.getAddress(
-        safeAddress as string
-      );
-      console.log("nonce", nonce);
+      if (service && sdk) {
+        const nonce = await service.getNextNonce(safeAddress as string);
+        const safeAddressChecksummed = ethers.utils.getAddress(
+          safeAddress as string
+        );
 
-      const safeTransactionData: SafeTransactionDataPartial = {
-        to: form.values.address,
-        value: ethers.utils.parseUnits(form.values.amount, 18).toString(), // 1 wei
-        data: "0x",
-        operation: OperationType.Call,
-        nonce: nonce,
-      };
-      const safeTransaction = await safe.createTransaction({
-        safeTransactionData,
-      });
-      console.log("safeTransaction", safeTransaction);
+        const safeTransactionData: SafeTransactionDataPartial = {
+          to: form.values.address,
+          value: ethers.utils.parseUnits(form.values.amount, 18).toString(),
+          data: "0x",
+          operation: OperationType.Call,
+          nonce,
+        };
+        const safeTransaction = await sdk.createTransaction({
+          safeTransactionData,
+        });
+        console.log("safeTransaction", safeTransaction);
 
-      const senderAddress = await signer!.getAddress();
-      const safeTxHash = await safe.getTransactionHash(safeTransaction);
-      const signature = await safe.signTransactionHash(safeTxHash);
+        const senderAddress = await signer!.getAddress();
+        const safeTxHash = await sdk.getTransactionHash(safeTransaction);
+        const signature = await sdk.signTransactionHash(safeTxHash);
 
-      console.log("safeTxHash", safeTxHash);
-      console.log("signature", signature);
+        console.log("safeTxHash", safeTxHash);
+        console.log("signature", signature);
 
-      // Propose transaction to the service
-      const proposedTx = await service.proposeTransaction({
-        safeAddress: safeAddressChecksummed,
-        safeTransactionData: safeTransaction.data,
-        safeTxHash,
-        senderAddress,
-        senderSignature: signature.data,
-      });
+        // Propose transaction to the service
+        await service.proposeTransaction({
+          safeAddress: safeAddressChecksummed,
+          safeTransactionData: safeTransaction.data,
+          safeTxHash,
+          senderAddress,
+          senderSignature: signature.data,
+        });
 
-      showNotification({
-        message: <Text size="lg">Transaction is submitted successfully</Text>,
-        autoClose: 1000,
-      });
-      form.setValues({ address: "", amount: "" });
+        showNotification({
+          message: <Text size="lg">Transaction is submitted successfully</Text>,
+          autoClose: 1000,
+        });
+        form.setValues({ address: "", amount: "" });
+      }
     } catch (e: any) {
       setErrorMessage(e.message);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const fetchTokens = async () => {
+    if (service && safeAddress) {
+      console.log(await service?.getBalances(safeAddress as string));
+    }
+  };
+
+  // useEffect(() => {
+  //   fetchTokens();
+  // }, [sdk, service]);
 
   return (
     <form onSubmit={form.onSubmit(handleFormSubmit)}>
@@ -107,11 +113,15 @@ export default function SendTokenForm() {
         }}
         align="stretch"
       >
-        <CurrencySelector />
+        <CurrencySelector
+          walletAddress={safeAddress}
+          value={selectedToken}
+          onChange={setSelectedToken}
+        />
         <TextInput
           placeholder="Enter recipient address"
           className={styles.addressInput}
-          size="md"
+          size="lg"
           {...form.getInputProps("address")}
         />
         <TextInput
@@ -121,11 +131,11 @@ export default function SendTokenForm() {
           rightSection={
             <Group spacing={12} position="right" noWrap>
               <Text type="gradient" weight="bold">
-                ETH
+                {selectedToken?.token.symbol}
               </Text>
             </Group>
           }
-          size="md"
+          size="lg"
           styles={{
             input: {
               paddingRight: 96,

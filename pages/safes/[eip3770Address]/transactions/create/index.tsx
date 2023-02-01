@@ -26,7 +26,7 @@ export default function Home() {
             </Text>
             <Button
               onClick={() =>
-                push(`/safes/${query.safeAddress}/transactions/create/send`)
+                push(`/safes/${query.eip3770Address}/transactions/create/send`)
               }
               w="100%"
             >
