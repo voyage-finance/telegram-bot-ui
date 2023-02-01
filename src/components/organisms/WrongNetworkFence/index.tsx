@@ -7,7 +7,7 @@ import { ChainID } from "@types";
 import { useSwitchNetwork } from "wagmi";
 import { useIsMounted } from "@utils/hooks";
 
-const WrongNetworkBanner: React.FC<
+const WrongNetworkFence: React.FC<
   PropsWithChildren<{
     currentChainId: ChainID;
     urlChainId: ChainID;
@@ -58,4 +58,4 @@ const WrongNetworkBanner: React.FC<
   );
 };
 
-export default WrongNetworkBanner;
+export default WrongNetworkFence;

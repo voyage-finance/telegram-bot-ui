@@ -1,4 +1,5 @@
-import WrongNetworkBanner from "@components/organisms/WrongNetworkBanner";
+import WalletConnectionFence from "@components/moleculas/WalletConnectionFence";
+import WrongNetworkFence from "@components/organisms/WrongNetworkFence";
 import Safe from "@safe-global/safe-core-sdk";
 import { parseEip3770Address } from "@safe-global/safe-core-sdk-utils";
 import EthersAdapter from "@safe-global/safe-ethers-lib";
@@ -98,12 +99,14 @@ export const SafeServiceProvider: React.FC<PropsWithChildren> = ({
         urlChainId,
       }}
     >
-      <WrongNetworkBanner
-        currentChainId={chain?.id || ChainID.Mainnet}
-        urlChainId={urlChainId}
-      >
-        {children}
-      </WrongNetworkBanner>
+      <WalletConnectionFence>
+        <WrongNetworkFence
+          currentChainId={chain?.id || ChainID.Mainnet}
+          urlChainId={urlChainId}
+        >
+          {children}
+        </WrongNetworkFence>
+      </WalletConnectionFence>
     </SafeServiceContext.Provider>
   );
 };
