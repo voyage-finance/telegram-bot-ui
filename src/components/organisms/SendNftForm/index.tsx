@@ -1,27 +1,20 @@
 import { Button, Text } from "@components/atoms";
-import Card from "@components/moleculas/Card";
-import ConnectBtn from "@components/moleculas/ConnectBtn";
-import { Group, Stack, TextInput } from "@mantine/core";
+import { Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import {
-  OperationType,
-  SafeTransactionDataPartial,
-} from "@safe-global/safe-core-sdk-types";
+import { SafeTransactionDataPartial } from "@safe-global/safe-core-sdk-types";
 import { ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSigner } from "wagmi";
 import styles from "./styles.module.scss";
-import { useRouter } from "next/router";
 import { showNotification } from "@mantine/notifications";
-import CurrencySelector from "@components/moleculas/CurrencySelector";
 import { useSafeService } from "@components/layouts/SafeServiceProvider";
-import { SafeBalanceResponse } from "@safe-global/safe-service-client";
-import { buildTransaction } from "@utils/transaction";
+import { SafeCollectibleResponse } from "@safe-global/safe-service-client";
+import { buildERC721Transaction } from "@utils/transaction";
+import NFTSelector from "@components/moleculas/NFTSelector";
 import { checkAddressChecksum } from "ethereum-checksum-address";
 
-export default function SendTokenForm() {
+export default function SendNftForm() {
   const { data: signer } = useSigner();
-
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { service, sdk, safeAddress } = useSafeService();
@@ -29,8 +22,7 @@ export default function SendTokenForm() {
   const form = useForm({
     initialValues: {
       address: "",
-      amount: "",
-      selectedToken: undefined as SafeBalanceResponse | undefined,
+      selectedNft: undefined as SafeCollectibleResponse | undefined,
     },
     validate: {
       address: (value) => {
@@ -42,8 +34,8 @@ export default function SendTokenForm() {
         }
         return "Enter recipient address.";
       },
-      selectedToken: (value) => {
-        if (!value) return "Select Token";
+      selectedNft: (value) => {
+        if (!value) return "Select NFT";
         return null;
       },
     },
@@ -59,11 +51,12 @@ export default function SendTokenForm() {
         );
 
         const safeTransactionData: SafeTransactionDataPartial =
-          await buildTransaction({
+          await buildERC721Transaction({
             receiverAddress: form.values.address,
-            tokenAddress: form.values.selectedToken?.tokenAddress,
+            tokenAddress: form.values.selectedNft!.address,
+            tokenId: form.values.selectedNft!.id,
             nonce,
-            amount: form.values.amount,
+            safeAddress,
           });
         const safeTransaction = await sdk.createTransaction({
           safeTransactionData,
@@ -90,7 +83,7 @@ export default function SendTokenForm() {
           message: <Text size="lg">Transaction is submitted successfully</Text>,
           autoClose: 1000,
         });
-        form.setValues({ address: "", amount: "" });
+        form.setValues({ address: "" });
       }
     } catch (e: any) {
       setErrorMessage(e.message);
@@ -98,16 +91,6 @@ export default function SendTokenForm() {
       setIsLoading(false);
     }
   };
-
-  const fetchTokens = async () => {
-    if (service && safeAddress) {
-      console.log(await service?.getBalances(safeAddress as string));
-    }
-  };
-
-  // useEffect(() => {
-  //   fetchTokens();
-  // }, [sdk, service]);
 
   return (
     <form onSubmit={form.onSubmit(handleFormSubmit)}>
@@ -118,14 +101,14 @@ export default function SendTokenForm() {
         align="stretch"
       >
         <div>
-          <CurrencySelector
+          <NFTSelector
             walletAddress={safeAddress}
-            value={form.values.selectedToken}
-            onChange={(value) => form.setFieldValue("selectedToken", value)}
+            value={form.values.selectedNft}
+            onChange={(value) => form.setFieldValue("selectedNft", value)}
           />
-          {form.errors.selectedToken && (
+          {form.errors.selectedNft && (
             <Text type="danger" lineClamp={4}>
-              {form.errors.selectedToken}
+              {form.errors.selectedNft}
             </Text>
           )}
         </div>
@@ -134,29 +117,6 @@ export default function SendTokenForm() {
           className={styles.addressInput}
           size="lg"
           {...form.getInputProps("address")}
-        />
-        <TextInput
-          placeholder="Enter amount"
-          className={styles.addressInput}
-          type="number"
-          rightSection={
-            <Group spacing={12} position="right" noWrap>
-              <Text type="gradient" weight="bold">
-                {form.values.selectedToken?.token.symbol}
-              </Text>
-            </Group>
-          }
-          size="lg"
-          styles={{
-            input: {
-              paddingRight: 96,
-            },
-            rightSection: {
-              right: 12.5,
-              width: 78,
-            },
-          }}
-          {...form.getInputProps("amount")}
         />
         <Button loading={isLoading} type="submit">
           Submit transaction

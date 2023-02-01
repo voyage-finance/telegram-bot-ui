@@ -1,4 +1,5 @@
 import TitleWithLine from "@components/moleculas/TitleWithLine";
+import SendNftForm from "@components/organisms/SendNftForm";
 import SendTokenForm from "@components/organisms/SendTokenForm";
 import { SegmentedControl, Stack } from "@mantine/core";
 import * as React from "react";
@@ -50,6 +51,7 @@ const SendPage: React.FunctionComponent = () => {
           }}
         />
         {currentTab == TransferType.TOKEN && <SendTokenForm />}
+        {currentTab == TransferType.NFT && <SendNftForm />}
       </Stack>
     </div>
   );
