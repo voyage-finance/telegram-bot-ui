@@ -19,17 +19,25 @@ import { SafeBalanceResponse } from "@safe-global/safe-service-client";
 import { buildTransaction } from "@utils/transaction";
 import { checkAddressChecksum } from "ethereum-checksum-address";
 
-export default function SendTokenForm() {
+const SendTokenForm: React.FC<{
+  amount?: string;
+  to?: string;
+  currency?: string;
+}> = ({ amount, to, currency }) => {
   const { data: signer } = useSigner();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { service, sdk, safeAddress } = useSafeService();
 
+  useEffect(() => {
+    console.log("[SendTokenForm]", amount, to, currency);
+  }, []);
+
   const form = useForm({
     initialValues: {
-      address: "",
-      amount: "",
+      address: to || "",
+      amount: amount || "",
       selectedToken: undefined as SafeBalanceResponse | undefined,
     },
     validate: {
@@ -99,16 +107,6 @@ export default function SendTokenForm() {
     }
   };
 
-  const fetchTokens = async () => {
-    if (service && safeAddress) {
-      console.log(await service?.getBalances(safeAddress as string));
-    }
-  };
-
-  // useEffect(() => {
-  //   fetchTokens();
-  // }, [sdk, service]);
-
   return (
     <form onSubmit={form.onSubmit(handleFormSubmit)}>
       <Stack
@@ -169,4 +167,6 @@ export default function SendTokenForm() {
       </Stack>
     </form>
   );
-}
+};
+
+export default SendTokenForm;

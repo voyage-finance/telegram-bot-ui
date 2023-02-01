@@ -2,6 +2,7 @@ import TitleWithLine from "@components/moleculas/TitleWithLine";
 import SendNftForm from "@components/organisms/SendNftForm";
 import SendTokenForm from "@components/organisms/SendTokenForm";
 import { SegmentedControl, Stack } from "@mantine/core";
+import { useRouter } from "next/router";
 import * as React from "react";
 import styles from "./index.module.scss";
 
@@ -10,7 +11,11 @@ export enum TransferType {
   NFT = "NFT",
 }
 
-const SendPage: React.FunctionComponent = () => {
+const SendPage: React.FunctionComponent<{
+  amount?: string;
+  to?: string;
+  currency?: string;
+}> = ({ amount, to, currency }) => {
   const [currentTab, setCurrentTab] = React.useState<TransferType>(
     TransferType.TOKEN
   );
@@ -50,11 +55,21 @@ const SendPage: React.FunctionComponent = () => {
             },
           }}
         />
-        {currentTab == TransferType.TOKEN && <SendTokenForm />}
+        {currentTab == TransferType.TOKEN && (
+          <SendTokenForm to={to} amount={amount} currency={currency} />
+        )}
         {currentTab == TransferType.NFT && <SendNftForm />}
       </Stack>
     </div>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  const { amount, to, currency } = context.query;
+
+  return {
+    props: { amount: amount || "", to: to || "", currency: currency || "" },
+  };
+}
 
 export default SendPage;

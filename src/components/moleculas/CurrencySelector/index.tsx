@@ -14,29 +14,35 @@ const CurrencySelector: React.FunctionComponent<{
   walletAddress?: string;
   value?: SafeBalanceResponse;
   onChange?: (value: SafeBalanceResponse) => void;
-}> = ({ walletAddress, value, onChange }) => {
+  preselectedCurrency?: string;
+}> = ({ walletAddress, value, onChange, preselectedCurrency }) => {
   const { chain } = useNetwork();
   const [tokens, setTokens] = React.useState<SafeBalanceResponse[]>([]);
   const { service } = useSafeService();
 
   const fetchTokens = async () => {
     if (service && walletAddress && chain) {
-      console.log(await service?.getBalances(walletAddress as string));
-      setTokens(
-        (await service?.getBalances(walletAddress as string)).map((response) =>
-          response.token
-            ? response
-            : {
-                ...response,
-                token: {
-                  ...chain!.nativeCurrency,
-                  logoUri: `https://safe-transaction-assets.safe.global/chains/${
-                    chain!.id
-                  }/currency_logo.png`,
-                },
-              }
-        )
+      const checksummedAddress = ethers.utils.getAddress(walletAddress);
+      const tokens = (
+        await service?.getBalances(checksummedAddress as string)
+      ).map((response) =>
+        response.token
+          ? response
+          : {
+              ...response,
+              token: {
+                ...chain!.nativeCurrency,
+                logoUri: `https://safe-transaction-assets.safe.global/chains/${
+                  chain!.id
+                }/currency_logo.png`,
+              },
+            }
       );
+      setTokens(tokens);
+      const preselectedToken = tokens.find((t) => t.token.name);
+      if (preselectedToken) {
+        onChange?.(preselectedToken);
+      }
     } else {
       console.log("one of [service && walletAddress && chain] is undefined");
     }

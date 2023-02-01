@@ -43,6 +43,7 @@ export const SafeServiceProvider: React.FC<PropsWithChildren> = ({
   const [isLoading, setIsLoading] = React.useState(true);
 
   const router = useRouter();
+
   let { eip3770Address } = router.query;
   eip3770Address = eip3770Address || "matic:0x";
   const { prefix, address: safeAddress } = parseEip3770Address(
