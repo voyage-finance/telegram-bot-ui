@@ -16,6 +16,7 @@ import { showNotification } from "@mantine/notifications";
 import CurrencySelector from "@components/moleculas/CurrencySelector";
 import { useSafeService } from "@components/layouts/SafeServiceProvider";
 import { SafeBalanceResponse } from "@safe-global/safe-service-client";
+import { buildTransaction } from "@utils/transaction";
 
 export default function SendTokenForm() {
   const { data: signer } = useSigner();
@@ -54,13 +55,13 @@ export default function SendTokenForm() {
           safeAddress as string
         );
 
-        const safeTransactionData: SafeTransactionDataPartial = {
-          to: form.values.address,
-          value: ethers.utils.parseUnits(form.values.amount, 18).toString(),
-          data: "0x",
-          operation: OperationType.Call,
-          nonce,
-        };
+        const safeTransactionData: SafeTransactionDataPartial =
+          await buildTransaction({
+            receiverAddress: form.values.address,
+            tokenAddress: selectedToken?.tokenAddress,
+            nonce,
+            amount: form.values.amount,
+          });
         const safeTransaction = await sdk.createTransaction({
           safeTransactionData,
         });
