@@ -77,8 +77,7 @@ const SendTokenForm: React.FC<{
         console.log("safeTransaction", safeTransaction);
 
         const senderAddress = await signer!.getAddress();
-        const safeTxHash =
-          "0x2dc849432a49ee80d83210f54c81823f3b73ce1fe66ebeeefdb5734b4293ca1e"; // await sdk.getTransactionHash(safeTransaction);
+        const safeTxHash = await sdk.getTransactionHash(safeTransaction);
         const signature = await sdk.signTransactionHash(safeTxHash);
 
         console.log("safeTxHash", safeTxHash);
