@@ -30,13 +30,9 @@ const SendTokenForm: React.FC<{
   const [errorMessage, setErrorMessage] = useState("");
   const { service, sdk, safeAddress } = useSafeService();
 
-  useEffect(() => {
-    console.log("[SendTokenForm]", amount, to, currency);
-  }, []);
-
   const form = useForm({
     initialValues: {
-      address: to || "",
+      address: "",
       amount: amount || "",
       selectedToken: undefined as SafeBalanceResponse | undefined,
     },
@@ -106,6 +102,17 @@ const SendTokenForm: React.FC<{
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (to) {
+      try {
+        const checksumedAddres = ethers.utils.getAddress(to);
+        form.setFieldValue("address", checksumedAddres);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [to]);
 
   return (
     <form onSubmit={form.onSubmit(handleFormSubmit)}>
