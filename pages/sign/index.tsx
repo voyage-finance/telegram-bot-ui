@@ -49,12 +49,7 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
 
   const [siweMessage, setSiweMessage] = React.useState("");
 
-  const {
-    data: signedData,
-    error: signError,
-    isLoading,
-    signMessage,
-  } = useSignMessage({
+  const { error: signError, signMessage } = useSignMessage({
     async onSuccess(data, variables) {
       try {
         const address = verifyMessage(variables.message, data);

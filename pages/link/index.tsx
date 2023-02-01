@@ -18,6 +18,7 @@ import { useSafeService } from "@components/layouts/SafeServiceProvider";
 import { getShortenedAddress } from "@utils/index";
 import { CHAIN_ID_NETWORK } from "@utils/config";
 import { ChainID } from "@types";
+import { submitSetup } from "api";
 
 interface ISignPageProps {}
 
@@ -50,24 +51,21 @@ const LinkPage: React.FunctionComponent<ISignPageProps> = (props) => {
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const { chain } = useNetwork();
-  const [step, setStep] = React.useState(2);
+  const [step, setStep] = React.useState(1);
   const [safes, setSafes] = React.useState<string[]>([]);
   const [selectedSafe, setSelectedSafe] = React.useState<string>();
   const recoveredAddress = React.useRef<string>();
 
   const [siweMessage, setSiweMessage] = React.useState("");
+  const [signedMessage, setSignedMessage] = React.useState("");
 
-  const {
-    data: signedData,
-    error: signError,
-    isLoading,
-    signMessage,
-  } = useSignMessage({
+  const { error: signError, signMessage } = useSignMessage({
     async onSuccess(data, variables) {
       try {
         setLoading(true);
         const address = verifyMessage(variables.message, data);
         recoveredAddress.current = address;
+        setSignedMessage(data);
         setStep(2);
         setLoading(false);
       } catch (e: any) {
@@ -88,6 +86,28 @@ const LinkPage: React.FunctionComponent<ISignPageProps> = (props) => {
     }
   };
   const { service, isLoading: isSafeLoading } = useSafeService();
+
+  const handleFormSubmit = async () => {
+    if (!selectedSafe) {
+      setError("Choose safe");
+      return;
+    }
+    try {
+      setLoading(true);
+      const response = await submitSetup(
+        msg_id,
+        siweMessage,
+        signedMessage,
+        selectedSafe!
+      );
+      setLoading(false);
+      if (response.ok) router.push("/link/success");
+      else throw new Error(`Error: ${response.status} ${response.statusText}`);
+    } catch (e: any) {
+      setLoading(false);
+      setError(e.message);
+    }
+  };
 
   React.useEffect(() => {
     const siweMsg = createSiweMessage(address!, message, chain?.id);
@@ -185,7 +205,7 @@ const LinkPage: React.FunctionComponent<ISignPageProps> = (props) => {
             </Group>
           ))}
 
-          <Button onClick={() => undefined} loading={loading} fullWidth>
+          <Button onClick={handleFormSubmit} loading={loading} fullWidth>
             confirm
           </Button>
           {signError && <Text type="danger">{signError.message}</Text>}
