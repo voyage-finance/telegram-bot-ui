@@ -43,7 +43,7 @@ function createSiweMessage(
   return siweMessage.prepareMessage();
 }
 
-const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
+const LinkPage: React.FunctionComponent<ISignPageProps> = (props) => {
   const router = useRouter();
   const { address } = useAccount();
   const { message, name, msg_id } = router.query as any;
@@ -213,4 +213,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default SignPage;
+export default LinkPage;
