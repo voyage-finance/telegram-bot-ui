@@ -62,8 +62,10 @@ const SignPage: React.FunctionComponent<ISignPageProps> = (props) => {
         );
         setLoading(false);
         if (response.ok) router.push("/sign/success");
-        else
-          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        else {
+          const error = await response.json();
+          throw new Error(error);
+        }
       } catch (e: any) {
         setLoading(false);
         setError(e.message);

@@ -20,11 +20,12 @@ export const submitSetup = async (
 ) => {
   const data = { id: Number.parseInt(id), message, signature, safeAddress };
 
-  return await fetch(`/api/link`, {
+  const res = await fetch(`/api/link`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
+  return res;
 };
 
 export const notifyTransaction = async (
