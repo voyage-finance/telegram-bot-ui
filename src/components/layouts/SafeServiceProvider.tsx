@@ -15,9 +15,11 @@ import { useNetwork, useSigner } from "wagmi";
 const SafeServiceContext = createContext<{
   service?: SafeServiceClient;
   isLoading: boolean;
+  txServiceUrl: string;
 }>({
   service: undefined,
   isLoading: false,
+  txServiceUrl: "",
 });
 
 export const SafeServiceProvider: React.FC<PropsWithChildren> = ({
@@ -27,6 +29,7 @@ export const SafeServiceProvider: React.FC<PropsWithChildren> = ({
   const { data: signer } = useSigner();
   const [safeService, setSafeService] = useState<SafeServiceClient>();
   const [isLoading, setIsLoading] = React.useState(true);
+  const [txServiceUrl, setTxServiceUrl] = React.useState("");
 
   React.useEffect(() => {
     const initialize = async () => {
@@ -39,6 +42,7 @@ export const SafeServiceProvider: React.FC<PropsWithChildren> = ({
 
         const network = CHAIN_ID_NETWORK[chain.id as ChainID];
         const txServiceUrl = `https://safe-transaction-${network}.safe.global`;
+        setTxServiceUrl(txServiceUrl);
         setSafeService(
           new SafeServiceClient({
             txServiceUrl,
@@ -58,6 +62,7 @@ export const SafeServiceProvider: React.FC<PropsWithChildren> = ({
       value={{
         service: safeService,
         isLoading,
+        txServiceUrl,
       }}
     >
       <WalletConnectionFence>{children}</WalletConnectionFence>

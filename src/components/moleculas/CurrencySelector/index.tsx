@@ -1,4 +1,4 @@
-import { Avatar, Box, Group, Menu, Stack } from "@mantine/core";
+import { Box, Group, Loader, Menu, Stack } from "@mantine/core";
 import * as React from "react";
 import { ChevronDown } from "tabler-icons-react";
 import { Text } from "@components/atoms";
@@ -9,6 +9,7 @@ import { useNetwork } from "wagmi";
 import TokenPlacehoderSvg from "@assets/icons/token-placeholder.svg";
 import CheckOrangeSvg from "@assets/icons/check-orange.svg";
 import ImageWithFallback from "@components/atoms/ImageWithFallback";
+import { fetchActiveTokens } from "api";
 
 const CurrencySelector: React.FunctionComponent<{
   walletAddress?: string;
@@ -18,14 +19,17 @@ const CurrencySelector: React.FunctionComponent<{
 }> = ({ walletAddress, value, onChange, preselectedCurrency }) => {
   const { chain } = useNetwork();
   const [tokens, setTokens] = React.useState<SafeBalanceResponse[]>([]);
-  const { service } = useSafeService();
+  const { service, txServiceUrl } = useSafeService();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const fetchTokens = async () => {
     if (service && walletAddress && chain) {
+      setIsLoading(true);
       const checksummedAddress = ethers.utils.getAddress(walletAddress);
-      const tokens = (
-        await service?.getBalances(checksummedAddress as string)
-      ).map((response) =>
+
+      const tokens: SafeBalanceResponse[] = (
+        await fetchActiveTokens(txServiceUrl, checksummedAddress)
+      ).map((response: SafeBalanceResponse) =>
         response.token
           ? response
           : {
@@ -39,8 +43,6 @@ const CurrencySelector: React.FunctionComponent<{
             }
       );
       setTokens(tokens);
-      console.log("tokens", tokens);
-      console.log("preselectedCurrency", preselectedCurrency);
 
       const preselectedToken = tokens.find(
         (t) =>
@@ -49,6 +51,7 @@ const CurrencySelector: React.FunctionComponent<{
       if (preselectedToken) {
         onChange?.(preselectedToken);
       }
+      setIsLoading(false);
     } else {
       console.log("one of [service && walletAddress && chain] is undefined");
     }
@@ -82,13 +85,18 @@ const CurrencySelector: React.FunctionComponent<{
             ":hover": { cursor: "pointer" },
           }}
         >
-          <ImageWithFallback
-            src={value?.token?.logoUri || TokenPlacehoderSvg.src}
-            fallbackSrc={TokenPlacehoderSvg.src}
-            alt="logo"
-            width={24}
-            height={24}
-          />
+          {isLoading ? (
+            <Loader size={24} />
+          ) : (
+            <ImageWithFallback
+              src={value?.token?.logoUri || TokenPlacehoderSvg.src}
+              fallbackSrc={TokenPlacehoderSvg.src}
+              alt="logo"
+              width={24}
+              height={24}
+            />
+          )}
+
           <Stack spacing={0} ml={8}>
             <Text weight="bold">{value?.token?.name || "Select Token"}</Text>
             <Text type="secondary" size="sm">
@@ -118,9 +126,6 @@ const CurrencySelector: React.FunctionComponent<{
             key={token.tokenAddress}
             onClick={() => onChange?.(token)}
             rightSection={undefined}
-            sx={{
-              width: "100%",
-            }}
           >
             <Group py={8} px={16} spacing={0}>
               <ImageWithFallback
@@ -150,6 +155,19 @@ const CurrencySelector: React.FunctionComponent<{
             </Group>
           </Menu.Item>
         ))}
+        {(tokens.length === 0 || !isLoading) && (
+          <Menu.Item>
+            <Text>No active tokens</Text>
+          </Menu.Item>
+        )}
+        {isLoading && (
+          <Menu.Item>
+            <Group>
+              <Loader size={24} />
+              <Text>Loading...</Text>
+            </Group>
+          </Menu.Item>
+        )}
       </Menu.Dropdown>
     </Menu>
   );

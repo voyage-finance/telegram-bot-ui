@@ -40,3 +40,18 @@ export const notifyTransaction = async (
     body: JSON.stringify(data),
   });
 };
+
+export const fetchActiveTokens = async (
+  safeServiceUrl: string,
+  safeAddress: string
+) => {
+  try {
+    const res = await fetch(
+      `${safeServiceUrl}/api/v1/safes/${safeAddress}/balances/?exclude_spam=true&trusted=true`
+    );
+    return await res.json();
+  } catch (e) {
+    console.error("fetchActiveTokens", e);
+    return [];
+  }
+};
