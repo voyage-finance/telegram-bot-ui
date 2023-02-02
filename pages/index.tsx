@@ -1,7 +1,11 @@
 import Safes from "@components/organisms/Safes";
 import Head from "next/head";
+import { useEffect } from "react";
 
 export default function Home() {
+  useEffect(() => {
+    console.log("backend url", (process.env as any).API_URL);
+  }, []);
   return (
     <>
       <Head>
