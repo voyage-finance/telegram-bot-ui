@@ -3,12 +3,15 @@ import Card from "@components/moleculas/Card";
 import { Stack } from "@mantine/core";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import queryString from "query-string";
 
 const txBuildUrl =
   "https://app.safe.global/matic:0x775AD9C18e0D8dE7dFCFfc8540a0203F61b39A7e/apps?appUrl=https%3A%2F%2Fapps.gnosis-safe.io%2Ftx-builder";
 
 export default function Home() {
-  const { query, push } = useRouter();
+  const router = useRouter();
+
+  const queryStr = queryString.stringify(router.query);
 
   return (
     <>
@@ -26,7 +29,9 @@ export default function Home() {
             </Text>
             <Button
               onClick={() =>
-                push(`/safes/${query.eip3770Address}/transactions/create/send`)
+                router.push(
+                  `/safes/${router.query.eip3770Address}/transactions/create/send?${queryStr}`
+                )
               }
               w="100%"
             >
