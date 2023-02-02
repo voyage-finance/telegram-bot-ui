@@ -13,6 +13,7 @@ import {
 } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import { SafeServiceProvider } from "@components/layouts/SafeServiceProvider";
+import { SafeSdkProvider } from "@components/layouts/SafeSdkProvider";
 
 const { chains, provider } = configureChains(
   [polygon, mainnet],
@@ -49,9 +50,11 @@ export default function App({ Component, pageProps }: AppProps) {
           })}
         >
           <SafeServiceProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+            <SafeSdkProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </SafeSdkProvider>
           </SafeServiceProvider>
         </RainbowKitProvider>
       </SessionProvider>

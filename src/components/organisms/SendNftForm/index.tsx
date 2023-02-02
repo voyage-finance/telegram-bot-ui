@@ -12,12 +12,14 @@ import { SafeCollectibleResponse } from "@safe-global/safe-service-client";
 import { buildERC721Transaction } from "@utils/transaction";
 import NFTSelector from "@components/moleculas/NFTSelector";
 import { checkAddressChecksum } from "ethereum-checksum-address";
+import { useSafeSdk } from "@components/layouts/SafeSdkProvider";
 
 export default function SendNftForm() {
   const { data: signer } = useSigner();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const { service, sdk, safeAddress } = useSafeService();
+  const { service } = useSafeService();
+  const { sdk, safeAddress } = useSafeSdk();
 
   const form = useForm({
     initialValues: {
@@ -56,7 +58,7 @@ export default function SendNftForm() {
             tokenAddress: form.values.selectedNft!.address,
             tokenId: form.values.selectedNft!.id,
             nonce,
-            safeAddress,
+            safeAddress: safeAddress!,
           });
         const safeTransaction = await sdk.createTransaction({
           safeTransactionData,

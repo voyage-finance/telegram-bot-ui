@@ -19,6 +19,7 @@ import { SafeBalanceResponse } from "@safe-global/safe-service-client";
 import { buildTransaction } from "@utils/transaction";
 import { checkAddressChecksum } from "ethereum-checksum-address";
 import { notifyTransaction } from "api";
+import { useSafeSdk } from "@components/layouts/SafeSdkProvider";
 
 const SendTokenForm: React.FC<{
   amount?: string;
@@ -30,7 +31,8 @@ const SendTokenForm: React.FC<{
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const { service, sdk, safeAddress, chainPrefix } = useSafeService();
+  const { service } = useSafeService();
+  const { sdk, safeAddress, chainPrefix } = useSafeSdk();
 
   const form = useForm({
     initialValues: {
@@ -98,7 +100,7 @@ const SendTokenForm: React.FC<{
         });
 
         const txId = `multisig_${safeAddress}_${safeTxHash}`;
-        await notifyTransaction(txId, chainPrefix, chatId!);
+        await notifyTransaction(txId, chainPrefix!, chatId!);
         form.setValues({ address: "", amount: "" });
       }
     } catch (e: any) {
