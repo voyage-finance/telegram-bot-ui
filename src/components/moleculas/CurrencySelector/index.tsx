@@ -155,7 +155,7 @@ const CurrencySelector: React.FunctionComponent<{
             </Group>
           </Menu.Item>
         ))}
-        {(tokens.length === 0 || !isLoading) && (
+        {tokens.length === 0 && !isLoading && (
           <Menu.Item>
             <Text>No active tokens</Text>
           </Menu.Item>
