@@ -21,7 +21,7 @@ const SignSuccessPage: React.FunctionComponent<ISignSuccessPageProps> = (
         <Stack align="center">
           <CircleCheck style={{ color: "green" }} size={50} />
           <Text size="lg" weight="bold">
-            Signer added successfully
+            Address linked successfully
           </Text>
         </Stack>
       </Card>
