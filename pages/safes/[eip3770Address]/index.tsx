@@ -8,7 +8,7 @@ interface ISafePageProps {}
 
 const SafePage: React.FunctionComponent<ISafePageProps> = (props) => {
   const { query } = useRouter();
-  const { safeAddress } = query;
+  const { prefix,safeAddress } = query;
 
   const router = useRouter();
 
@@ -20,7 +20,7 @@ const SafePage: React.FunctionComponent<ISafePageProps> = (props) => {
     <Stack mx="auto" align="center">
       <TitleWithLine size="md">{safeAddress}</TitleWithLine>
       <a
-        href={`https://app.safe.global/matic:${safeAddress}/transactions/history`}
+        href={`https://app.safe.global/${prefix}:${safeAddress}/transactions/history`}
         target="_blank"
       >
         <Button w={300} type="button">
